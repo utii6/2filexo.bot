@@ -3,7 +3,7 @@ from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandl
 import telegram
 
 TOKEN = "7955735266:AAGSqtTDWtCbnjYVZIScdKqIQkLFnEiZHJY"
-CHANNEL = "@qd3qd"  # معرف القناة
+CHANNEL = "@qd3qd"  # معرف القنااة
 
 # تحقق من الاشتراك
 async def is_subscribed(bot: telegram.Bot, user_id):
