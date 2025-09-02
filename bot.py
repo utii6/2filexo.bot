@@ -17,7 +17,7 @@ USERS_FILE = "users.txt"
 WEBHOOK_PATH = f"/webhook/{TOKEN}"
 # --------------------------------
 
-app = FastAPI()
+fastapi_app = FastAPI()
 telegram_app = Application.builder().token(TOKEN).build()
 
 
