@@ -7,7 +7,7 @@ from telegram.error import Forbidden
 # ------ عدّل هذه القيم ----------
 TOKEN = "7955735266:AAGSqtTDWtCbnjYVZIScdKqIQkLFnEiZHJY"
 ADMIN_ID = 5581457665
-WEBAPP_URL = "https://x-o-bot.onrender.com"     # رابط لعبتك
+WEBAPP_URL = "https://x-o.bot.onrender.com"     # رابط لعبتك
 USERS_FILE = "users.txt"
 CHANNEL_USERNAME = "Qd3Qd"               # بدون @
 CHANNEL_LINK = "https://t.me/qd3qd"
@@ -15,7 +15,7 @@ PORT = int(os.environ.get("PORT", 10000))
 # --------------------------------
 
 WEBHOOK_PATH = f"/webhook/{TOKEN}"
-WEBHOOK_URL = f"https://x-o-bot.onrender.com{WEBHOOK_PATH}"
+WEBHOOK_URL = f"https://x-o.bot.onrender.com{WEBHOOK_PATH}"
 
 # FastAPI
 fastapi_app = FastAPI()
