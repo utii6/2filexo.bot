@@ -7,7 +7,7 @@ from telegram.error import Forbidden
 # ---------- إعدادات ----------
 TOKEN = "7955735266:AAGSqtTDWtCbnjYVZIScdKqIQkLFnEiZHJY"
 ADMIN_ID = 5581457665
-WEBAPP_URL = "https://twofilexo-bot.onrender.com"
+WEBAPP_URL = "https://x_o.bot.onrender.com"
 USERS_FILE = "users.txt"
 CHANNEL_USERNAME = "Qd3Qd"
 CHANNEL_LINK = "https://t.me/qd3qd"
