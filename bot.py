@@ -7,9 +7,9 @@ from telegram.error import Forbidden
 # ------ عدّل هذه القيم ----------
 TOKEN = "7955735266:AAGSqtTDWtCbnjYVZIScdKqIQkLFnEiZHJY"
 ADMIN_ID = 5581457665
-WEBAPP_URL = "https://x-o.bot.onrender.com"     # رابط لعبتك
+WEBAPP_URL = "https://x-o.bot.onrender.com"
 USERS_FILE = "users.txt"
-CHANNEL_USERNAME = "Qd3Qd"               # بدون @
+CHANNEL_USERNAME = "Qd3Qd"
 CHANNEL_LINK = "https://t.me/qd3qd"
 PORT = int(os.environ.get("PORT", 10000))
 # --------------------------------
@@ -17,8 +17,10 @@ PORT = int(os.environ.get("PORT", 10000))
 WEBHOOK_PATH = f"/webhook/{TOKEN}"
 WEBHOOK_URL = f"https://x-o.bot.onrender.com{WEBHOOK_PATH}"
 
-# FastAPI
+# FastAPI app
 fastapi_app = FastAPI()
+
+# Telegram Application
 application = Application.builder().token(TOKEN).build()
 
 
@@ -70,7 +72,7 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if is_subscribed:
             await send_welcome(update, context, callback=True)
         else:
-            await query.edit_message_text("❌  .اشتـرك حبيبي اشتـرك.")
+            await query.edit_message_text("❌.اشتـرك حبيبي اشتـرك.")
 
 
 # --- الترحيب + إشعار المالك ---
@@ -120,7 +122,7 @@ async def send_welcome(update, context, callback=False):
 
     if callback:
         await update.callback_query.edit_message_text(
-            f"أهلاً {user.first_name or ''} 👋\nاضغط الزر للعب XO!",
+            f"أهلاً {user.first_name or ''} 👋\nاضغط الزر للعب XOوفوز !",
             reply_markup=reply_markup
         )
     else:
@@ -135,18 +137,20 @@ application.add_handler(CommandHandler("start", start))
 application.add_handler(CallbackQueryHandler(button_callback))
 
 
-# --- FastAPI Webhook ---
+# --- FastAPI Webhook Endpoint ---
 @fastapi_app.post(WEBHOOK_PATH)
 async def telegram_webhook(request: Request):
     data = await request.json()
     update = Update.de_json(data, application.bot)
-    await application.initialize()
+    await application.initialize()  # تهيئة التطبيق
     await application.process_update(update)
     return {"ok": True}
 
 
+# --- Startup Event ---
 @fastapi_app.on_event("startup")
 async def on_startup():
+    # تعيين Webhook
     await application.bot.set_webhook(WEBHOOK_URL)
     print("✅ Webhook set:", WEBHOOK_URL)
 
