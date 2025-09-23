@@ -6,7 +6,7 @@ from telegram.ext import Application, CommandHandler, CallbackQueryHandler, Cont
 from telegram.error import Forbidden
 
 # ------------------- إعدادات البوت -------------------
-TOKEN = "7955735266:AAGSqtTDWtCbnjYVZIScdKqIQkLFnEiZHJY"
+TOKEN = "7955735266:AAFBGu_RXstAQ-X9uhTzLKF6YfKc53nl8I8"
 ADMIN_ID = 5581457665
 WEBAPP_URL = "https://x-o-bot.onrender.com"  # رابط لعبتك
 USERS_FILE = "users.txt"
