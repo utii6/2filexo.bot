@@ -1,6 +1,6 @@
 import os
 import logging
-import urllib.parse  # لاستخدامه في تشفير رابط المشاركة
+# لم نعد بحاجة لـ urllib.parse لأننا نستخدم رابطاً بسيطاً
 from fastapi import FastAPI, Request
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update, WebAppInfo
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
@@ -9,7 +9,8 @@ from telegram.error import Forbidden
 # ------------------- إعدادات البوت -------------------
 TOKEN = "7955735266:AAFBGu_RXstAQ-X9uhTzLKF6YfKc53nl8I8"
 ADMIN_ID = 5581457665
-WEBAPP_URL = "https://x-o-bot.onrender.com"
+# WEBAPP_URL: سنستخدمه من هنا بدلاً من تعريفه في كل دالة
+WEBAPP_URL = "https://x-o-bot.onrender.com" 
 USERS_FILE = "users.txt"
 CHANNEL_USERNAME = "Qd3Qd"
 CHANNEL_LINK = "https://t.me/qd3qd"
@@ -18,19 +19,7 @@ PORT = int(os.environ.get("PORT", 10000))
 WEBHOOK_PATH = f"/webhook/{TOKEN}"
 WEBHOOK_URL = f"https://twofilexo-bot.onrender.com{WEBHOOK_PATH}"
 
-# ------------------- إعدادات زر المشاركة -------------------
-# !!! هام: استبدل "b2xobot" باسم المستخدم الفعلي لبوتك (بدون علامة @)
-BOT_USERNAME_FOR_SHARE = "b2xobot"  
-BOT_LINK_FOR_SHARE = f"https://t.me/{BOT_USERNAME_FOR_SHARE}"
-
-# النص الترويجي الذي يظهر عند مشاركة الرابط (كما ظهر في صورك)
-SHARE_TEXT_AR = "تعال نلعـب أكس أو والفائز اله نجووم 🩵⭐️.. ."
-
-# تشفير النص لضمان عمله ضمن رابط URL
-ENCODED_SHARE_TEXT = urllib.parse.quote_plus(SHARE_TEXT_AR)
-
-# رابط المشاركة الفعلي الذي سيفتح قائمة اختيار الصديق في تليجرام
-SHARE_URL = f"https://t.me/share/url?url={BOT_LINK_FOR_SHARE}&text={ENCODED_SHARE_TEXT}"
+# **ملاحظة:** تم حذف متغيرات المشاركة المعقدة (BOT_USERNAME_FOR_SHARE, SHARE_TEXT_AR, ENCODED_SHARE_TEXT, SHARE_URL)
 # ------------------------------------------------------
 
 logging.basicConfig(level=logging.INFO)
@@ -41,7 +30,7 @@ fastapi_app = FastAPI()
 application = Application.builder().token(TOKEN).build()
 
 
-# ----- دالة التحقق من الاشتراك -----
+# ----- دالة التحقق من الاشتراك (بدون تغيير) -----
 async def check_subscription(user_id, context):
     try:
         member = await context.bot.get_chat_member(f"@{CHANNEL_USERNAME}", user_id)
@@ -55,7 +44,7 @@ async def check_subscription(user_id, context):
     return True
 
 
-# ----- رسالة البداية -----
+# ----- رسالة البداية (بدون تغيير) -----
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     if not user:
@@ -78,7 +67,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await send_welcome(update, context)
 
 
-# ----- التحقق بعد الضغط -----
+# ----- التحقق بعد الضغط (بدون تغيير) -----
 async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -92,14 +81,14 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await query.edit_message_text("❌  .اشتـرك حبيبي اشتـرك.")
 
 
-# ----- الترحيب + إشعار المالك (تم تحديث لوحة المفاتيح هنا) -----
+# ----- الترحيب + إشعار المالك (تم تحديث لوحة المفاتيح لتشمل زر المشاركة المبسَّط) -----
 async def send_welcome(update, context, callback=False):
     user = update.effective_user
     user_id = user.id
     username = f"@{user.username}" if user.username else "لا يوجد"
     full_name = " ".join(filter(None, [user.first_name, user.last_name])) or "بدون اسم"
 
-    # --- كود تسجيل المستخدمين ---
+    # --- كود تسجيل المستخدمين (بدون تغيير) ---
     users = set()
     if os.path.exists(USERS_FILE):
         try:
@@ -137,31 +126,32 @@ async def send_welcome(update, context, callback=False):
     # --- نهاية كود تسجيل المستخدمين ---
 
 
-    # 1. لوحة المفاتيح المحدثة التي تحتوي على زر المشاركة
+    # 1. لوحة المفاتيح المحدثة (باستخدام الكود المبسَّط الذي أرسلته)
     keyboard = [
         [InlineKeyboardButton("🎮 العب وأربـح XO", web_app=WebAppInfo(url=WEBAPP_URL))],
-        [InlineKeyboardButton("🔗 مشاركة لصاحبـك", url=SHARE_URL)] 
+        # زر المشاركة المبسَّط
+        [InlineKeyboardButton("📤 العـب مع صاحبـك", url="https://t.me/share/url?url=@b2xobot")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     if callback:
         await update.callback_query.edit_message_text(
-            f"أهلاً {user.first_name or ''} 😂👋\nاضغط الزر للعب XO!",
+            f"أهلاً {user.first_name or ''} 👋\nاضغط الزر للعب XO!",
             reply_markup=reply_markup
         )
     else:
         await update.message.reply_text(
-            f"أهلاً {user.first_name or ''} 👋\nاضغط الزر للعب XO 😂!",
+            f"أهلاً {user.first_name or ''} 👋\nاضغط الزر للعب XO!",
             reply_markup=reply_markup
         )
 
 
-# ----- Handlers -----
+# ----- Handlers (بدون تغيير) -----
 application.add_handler(CommandHandler("start", start))
 application.add_handler(CallbackQueryHandler(button_callback))
 
 
-# ----- FastAPI Webhook -----
+# ----- FastAPI Webhook (بدون تغيير) -----
 @fastapi_app.post(WEBHOOK_PATH)
 async def telegram_webhook(request: Request):
     data = await request.json()
