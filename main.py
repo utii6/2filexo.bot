@@ -105,15 +105,17 @@ async def send_welcome(update, context, callback=False):
             logger.error(f"كتابة users.txt فشلت: {e}")
 
         count = len(users)
-        admin_text = (
-            "🎉 دخول مستخدم جديد للبوت!\n"
-            "-----------------------\n"
-            f"• الاسم: {full_name}\n"
-            f"• المعرف: {username}\n"
-            f"• الآيدي: {user_id}\n"
-            "-----------------------\n"
-            f"•😂 العدد الكلي للمستخدمين: {count}"
-        )
+        extra_number = 382  # الرقم الذي تريد إضافته قبل عدد المشتركين
+
+admin_text = (
+    "دخول نفـرر جديد لبوتك 😎\n"
+    "-----------------------\n"
+    f"• الاسم😂: {full_name}\n"
+    f"• معرف💁: {username}\n"
+    f"• الايدي🆔: {user_id}\n"
+    "-----------------------\n"
+    f"• عدد مشتركينك الابطال:😂 {extra_number + count}"
+)
         try:
             await context.bot.send_message(chat_id=ADMIN_ID, text=admin_text)
         except Exception as e:
