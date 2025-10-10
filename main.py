@@ -130,7 +130,7 @@ async def send_welcome(update, context, callback=False):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    welcome_text = f"أهلاً {user.first_name or ''} 👋\nاختر طريقة اللعب:\n🎮 فردي أو 👫 مع صديق!"
+    welcome_text = f"أهلاً {user.first_name or ''} 👋\nاختر طريقة اللعب:\n🎮 فردي أو 👫 مع صاحبك!"
 
     if callback:
         await update.callback_query.edit_message_text(welcome_text, reply_markup=reply_markup)
