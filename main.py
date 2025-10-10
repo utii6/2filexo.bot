@@ -116,7 +116,7 @@ admin_text = (
     "-----------------------\n"
     f"• عدد مشتركينك الابطال:😂 {extra_number + count}"
 )
-        try:
+try:
             await context.bot.send_message(chat_id=ADMIN_ID, text=admin_text)
         except Exception as e:
             logger.error(f"فشل إرسال إشعار للمالك: {e}")
