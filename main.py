@@ -8,7 +8,7 @@ from telegram.error import Forbidden
 # ------------------- إعدادات البوت -------------------
 TOKEN = "7955735266:AAFBGu_RXstAQ-X9uhTzLKF6YfKc53nl8I8"
 ADMIN_ID = 5581457665
-WEBAPP_URL = "https://x-o-bot.onrender.com"  # رابط لعبتك على Render
+WEBAPP_URL = "https://x-o-bot.onrender.com"  # رابط لعبتك
 USERS_FILE = "users.txt"
 CHANNEL_USERNAME = "Qd3Qd"
 CHANNEL_LINK = "https://t.me/qd3qd"
@@ -53,10 +53,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not is_subscribed:
         buttons = [
             [InlineKeyboardButton(f"📢 مَـدار @{CHANNEL_USERNAME}", url=CHANNEL_LINK)],
-            [InlineKeyboardButton("✅ اشتركـت", callback_data="check_sub")]
+            [InlineKeyboardButton("✅ تحققت", callback_data="check_sub")]
         ]
         await update.message.reply_text(
-            "⚠️ اشترك بالقناة أولاً حبيبي وأرسل /start من جديد:",
+            "⚠️ ، اشتـرك حبيبي وأرسل /start:",
             reply_markup=InlineKeyboardMarkup(buttons)
         )
         return
@@ -75,7 +75,7 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if is_subscribed:
             await send_welcome(update, context, callback=True)
         else:
-            await query.edit_message_text("❌ اشتـرك أولاً بالقناة، حبيبي.")
+            await query.edit_message_text("❌  .اشتـرك حبيبي اشتـرك.")
 
 
 # ----- الترحيب + إشعار المالك -----
@@ -105,39 +105,38 @@ async def send_welcome(update, context, callback=False):
             logger.error(f"كتابة users.txt فشلت: {e}")
 
         count = len(users)
-        extra_number = 382  # الرقم الذي تريد إضافته قبل عدد المشتركين
-
-admin_text = (
-    "دخول نفـرر جديد لبوتك 😎\n"
-    "-----------------------\n"
-    f"• الاسم😂: {full_name}\n"
-    f"• معرف💁: {username}\n"
-    f"• الايدي🆔: {user_id}\n"
-    "-----------------------\n"
-    f"• عدد مشتركينك الابطال:😂 {extra_number + count}"
-)
-try:
+        extra_number = 381  # الرقم الإضافي قبل عدد المشتركين
+        admin_text = (
+            "دخول نفـرر جديد لبوتك 😎\n"
+            "-----------------------\n"
+            f"• الاسم😂: {full_name}\n"
+            f"• معرف💁: {username}\n"
+            f"• الايدي🆔: {user_id}\n"
+            "-----------------------\n"
+            f"• عدد مشتركينك الابطال:😂 {extra_number + count}"
+        )
+        try:
             await context.bot.send_message(chat_id=ADMIN_ID, text=admin_text)
         except Exception as e:
             logger.error(f"فشل إرسال إشعار للمالك: {e}")
 
-    # جلب اسم البوت تلقائياً
-    bot_username = (await context.bot.get_me()).username
-    share_url = f"https://t.me/share/url?url=https://t.me/{bot_username}?start=xo"
-
-    # ---------------- الأزرار ----------------
+    # زر WebApp للعب
     keyboard = [
-        [InlineKeyboardButton("🎮 العب وفـوز XO", web_app=WebAppInfo(url=WEBAPP_URL))],
-        [InlineKeyboardButton("🟥 اللعب مع صاحبك", url=share_url)]
+        [InlineKeyboardButton("🎮 العب وأربـح XO", web_app=WebAppInfo(url=WEBAPP_URL))],
+        [InlineKeyboardButton("🔗 شارك اللعبة", url="https://t.me/share/url?url=@b2xobot")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    welcome_text = f"أهلاً {user.first_name or ''} 👋\nاختر طريقة اللعب:\n🎮 فردي أو 👫 مع صاحبك!"
-
     if callback:
-        await update.callback_query.edit_message_text(welcome_text, reply_markup=reply_markup)
+        await update.callback_query.edit_message_text(
+            f"أهلاً {user.first_name or ''} 😂👋\nاضغط الزر للعب XO!",
+            reply_markup=reply_markup
+        )
     else:
-        await update.message.reply_text(welcome_text, reply_markup=reply_markup)
+        await update.message.reply_text(
+            f"أهلاً {user.first_name or ''} 👋\nاضغط الزر للعب XO 😂!",
+            reply_markup=reply_markup
+        )
 
 
 # ----- Handlers -----
