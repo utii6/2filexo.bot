@@ -1,6 +1,5 @@
 import os
 import logging
-# لم نعد بحاجة لـ urllib.parse لأننا نستخدم رابطاً بسيطاً
 from fastapi import FastAPI, Request
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update, WebAppInfo
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
@@ -9,28 +8,24 @@ from telegram.error import Forbidden
 # ------------------- إعدادات البوت -------------------
 TOKEN = "7955735266:AAFBGu_RXstAQ-X9uhTzLKF6YfKc53nl8I8"
 ADMIN_ID = 5581457665
-# WEBAPP_URL: سنستخدمه من هنا بدلاً من تعريفه في كل دالة
-WEBAPP_URL = "https://x-o-bot.onrender.com" 
+WEBAPP_URL = "https://x-o-bot.onrender.com"
 USERS_FILE = "users.txt"
 CHANNEL_USERNAME = "Qd3Qd"
 CHANNEL_LINK = "https://t.me/qd3qd"
 PORT = int(os.environ.get("PORT", 10000))
-
 WEBHOOK_PATH = f"/webhook/{TOKEN}"
 WEBHOOK_URL = f"https://twofilexo-bot.onrender.com{WEBHOOK_PATH}"
-
-# **ملاحظة:** تم حذف متغيرات المشاركة المعقدة (BOT_USERNAME_FOR_SHARE, SHARE_TEXT_AR, ENCODED_SHARE_TEXT, SHARE_URL)
-# ------------------------------------------------------
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# FastAPI + Telegram Application
 fastapi_app = FastAPI()
 application = Application.builder().token(TOKEN).build()
 
+# مجموعة المستخدمين المسجلين
+registered_users = set()
 
-# ----- دالة التحقق من الاشتراك (بدون تغيير) -----
+# ----- دالة التحقق من الاشتراك -----
 async def check_subscription(user_id, context):
     try:
         member = await context.bot.get_chat_member(f"@{CHANNEL_USERNAME}", user_id)
@@ -44,7 +39,7 @@ async def check_subscription(user_id, context):
     return True
 
 
-# ----- رسالة البداية (بدون تغيير) -----
+# ----- رسالة البداية -----
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     if not user:
@@ -56,7 +51,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not is_subscribed:
         buttons = [
             [InlineKeyboardButton(f"📢 مَـدار @{CHANNEL_USERNAME}", url=CHANNEL_LINK)],
-            [InlineKeyboardButton("✅ تحققت", callback_data="check_sub")]
+            [InlineKeyboardButton("✅ أشتركـت", callback_data="check_sub")]
         ]
         await update.message.reply_text(
             "⚠️ ، اشتـرك حبيبي وأرسل /start:",
@@ -67,7 +62,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await send_welcome(update, context)
 
 
-# ----- التحقق بعد الضغط (بدون تغيير) -----
+# ----- التحقق بعد الضغط -----
 async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -81,35 +76,27 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await query.edit_message_text("❌  .اشتـرك حبيبي اشتـرك.")
 
 
-# ----- الترحيب + إشعار المالك (تم تحديث لوحة المفاتيح لتشمل زر المشاركة المبسَّط) -----
+# ----- الترحيب + إشعار المالك -----
 async def send_welcome(update, context, callback=False):
+    global registered_users
+
     user = update.effective_user
     user_id = user.id
     username = f"@{user.username}" if user.username else "لا يوجد"
     full_name = " ".join(filter(None, [user.first_name, user.last_name])) or "بدون اسم"
 
-    # --- كود تسجيل المستخدمين (بدون تغيير) ---
-    users = set()
-    if os.path.exists(USERS_FILE):
-        try:
-            with open(USERS_FILE, "r", encoding="utf-8") as f:
-                users = set(line.strip() for line in f if line.strip())
-        except Exception as e:
-            logger.error(f"قراءة users.txt فشلت: {e}")
-
-    is_new = str(user_id) not in users
-
-    if is_new:
-        users.add(str(user_id))
+    # تحقق من المستخدم الجديد
+    if str(user_id) not in registered_users:
+        registered_users.add(str(user_id))
         try:
             with open(USERS_FILE, "w", encoding="utf-8") as f:
-                for u in sorted(users):
+                for u in sorted(registered_users):
                     f.write(u + "\n")
         except Exception as e:
             logger.error(f"كتابة users.txt فشلت: {e}")
 
-        count = len(users)
-        extra_number = 7374
+        count = len(registered_users)
+        extra_number = 12858
         admin_text = (
             "دخول نفـرر جديد لبوتك 😎\n"
             "-----------------------\n"
@@ -123,13 +110,10 @@ async def send_welcome(update, context, callback=False):
             await context.bot.send_message(chat_id=ADMIN_ID, text=admin_text)
         except Exception as e:
             logger.error(f"فشل إرسال إشعار للمالك: {e}")
-    # --- نهاية كود تسجيل المستخدمين ---
 
-
-    # 1. لوحة المفاتيح المحدثة (باستخدام الكود المبسَّط الذي أرسلته)
+    # لوحة المفاتيح
     keyboard = [
         [InlineKeyboardButton("🎮 العب وأربـح XO", web_app=WebAppInfo(url=WEBAPP_URL))],
-        # زر المشاركة المبسَّط
         [InlineKeyboardButton("📤 العـب مع صاحبـك", url="https://t.me/share/url?url=@b2xobot")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -146,12 +130,12 @@ async def send_welcome(update, context, callback=False):
         )
 
 
-# ----- Handlers (بدون تغيير) -----
+# ----- Handlers -----
 application.add_handler(CommandHandler("start", start))
 application.add_handler(CallbackQueryHandler(button_callback))
 
 
-# ----- FastAPI Webhook (بدون تغيير) -----
+# ----- FastAPI Webhook -----
 @fastapi_app.post(WEBHOOK_PATH)
 async def telegram_webhook(request: Request):
     data = await request.json()
@@ -163,9 +147,14 @@ async def telegram_webhook(request: Request):
 
 @fastapi_app.on_event("startup")
 async def on_startup():
+    global registered_users
+    if os.path.exists(USERS_FILE):
+        with open(USERS_FILE, "r", encoding="utf-8") as f:
+            registered_users = set(line.strip() for line in f if line.strip())
     await application.initialize()
     await application.bot.set_webhook(WEBHOOK_URL)
     logger.info(f"✅ Webhook set: {WEBHOOK_URL}")
+    logger.info(f"📂 تم تحميل {len(registered_users)} مستخدم من الملف")
 
 
 @fastapi_app.get("/")
