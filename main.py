@@ -109,7 +109,7 @@ async def send_welcome(update, context, callback=False):
             logger.error(f"كتابة users.txt فشلت: {e}")
 
         count = len(users)
-        extra_number = 381
+        extra_number = 7374
         admin_text = (
             "دخول نفـرر جديد لبوتك 😎\n"
             "-----------------------\n"
